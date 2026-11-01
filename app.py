@@ -63,3 +63,16 @@ def delete_user(user_id: int, authorization: Optional[str] = Header(None)):
     if len(users) == before:
         return {"code": 404, "msg": "用户不存在"}
     return {"code": 200, "msg": "删除成功"}
+
+
+@app.put("/users/{user_id}")
+def update_user(user_id: int, data: UserIn, authorization: Optional[str] = Header(None)):
+    check_token(authorization)
+
+    for user in users:
+        if user["id"] == user_id:
+            user["username"] = data.username
+            user["phone"] = data.phone
+            return {"code": 200, "msg": "修改成功", "data": user}
+
+    return {"code": 404, "msg": "用户不存在"}

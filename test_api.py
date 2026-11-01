@@ -84,3 +84,30 @@ class TestUser:
             resp = client.send_request("DELETE", "/users/9999")
         with allure.step("断言返回 404 用户不存在"):
             assert resp.json()["code"] == 404
+
+    @allure.story("修改用户")
+    @allure.title("正常修改用户信息")
+    def test_update_user_success(self, client):
+        with allure.step("前置操作：创建一个新用户"):
+            payload = {"username": "old_name", "phone": "11111111111"}
+            create_resp = client.send_request("POST", "/users", json=payload)
+            user_id = create_resp.json()["data"]["id"]
+
+        with allure.step("发送修改请求"):
+            update_payload = {"username": "new_name", "phone": "22222222222"}
+            update_resp = client.send_request("PUT", f"/users/{user_id}", json=update_payload)
+
+        with allure.step("断言修改成功"):
+            body = update_resp.json()
+            assert body["code"] == 200
+            assert body["data"]["username"] == "new_name"
+
+    @allure.story("修改用户")
+    @allure.title("修改不存在的用户")
+    def test_update_not_exist_user(self, client):
+        with allure.step("发送修改请求，ID传9999"):
+            update_payload = {"username": "xxx", "phone": "222"}
+            update_resp = client.send_request("PUT", "/users/9999", json=update_payload)
+
+        with allure.step("断言返回 404"):
+            assert update_resp.json()["code"] == 404
