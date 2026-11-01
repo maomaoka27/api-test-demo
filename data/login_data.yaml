@@ -5,10 +5,30 @@
 
 - case_title: "密码错误"
   username: "admin"
-  password: "wrong"
+  password: "wrong_password"
+  expected_code: 500
+
+- case_title: "用户名不存在"
+  username: "not_exist_user"
+  password: "admin123"
   expected_code: 500
 
 - case_title: "用户名为空"
   username: ""
+  password: "admin123"
+  expected_code: 500
+
+- case_title: "密码为空"
+  username: "admin"
+  password: ""
+  expected_code: 500
+
+- case_title: "用户名超长字符测试"
+  username: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  password: "admin123"
+  expected_code: 500
+
+- case_title: "SQL注入测试"
+  username: "admin' OR '1'='1"
   password: "admin123"
   expected_code: 500
