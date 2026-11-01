@@ -111,3 +111,22 @@ class TestUser:
 
         with allure.step("断言返回 404"):
             assert update_resp.json()["code"] == 404
+
+    @allure.story("修改用户")
+    @allure.title("修改用户-异常参数测试(数据驱动)")
+    @pytest.mark.parametrize("update_data, expected_code", [
+        ({"username": "", "phone": "222"}, 400),                 # 用户名为空
+        ({"username": "a" * 50, "phone": "222"}, 200),           # 超长用户名 (为了看你接口会不会崩溃)
+        ({"username": "正常名", "phone": "我是手机号"}, 200)        # 手机号传中文 (测试后端是否有格式校验)
+    ])
+    def test_update_user_abnormal(self, client, update_data, expected_code):
+        with allure.step("前置操作：创建一个新用户"):
+            create_resp = client.send_request("POST", "/users", json={"username": "tmp", "phone": "111"})
+            user_id = create_resp.json()["data"]["id"]
+
+        with allure.step(f"发送修改请求，参数: {update_data}"):
+            # 这里如果用户名是空，我们的 app.py 里没写拦截，所以我们需要去看看它返回什么
+            resp = client.send_request("PUT", f"/users/{user_id}", json=update_data)
+
+        with allure.step("断言返回结果"):
+            assert resp.json()["code"] == expected_code

@@ -69,6 +69,9 @@ def delete_user(user_id: int, authorization: Optional[str] = Header(None)):
 def update_user(user_id: int, data: UserIn, authorization: Optional[str] = Header(None)):
     check_token(authorization)
 
+    if not data.username:
+        return {"code":400, "msg": "用户名不能为空"}
+
     for user in users:
         if user["id"] == user_id:
             user["username"] = data.username
