@@ -4,3 +4,4 @@ __pycache__/
 allure-results/
 *.pyc
 .idea/
+allure-results/
